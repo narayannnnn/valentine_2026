@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Valentine 😚💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+
+<style>
+
+  /* ---------- EXTRA PINK, BIGGER, CLEAR GRID ---------- */
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #ffc0cb;  /* solid pink */
+    overflow: hidden;
+  }
+  .page {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: 0.8s ease;
+    padding: 20px 20px 30px;
+  }
+  .page.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(15px);
+    padding: 30px;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    animation: float 3s infinite alternate;
+    max-width: 500px;
+    width: 100%;
+    margin: 30px auto;
+  }
+  @keyframes float {
+    from { transform: translateY(-10px); }
+    to { transform: translateY(10px); }
+  }
+  .cat { width: 150px; border-radius: 15px; }
+  input, button {
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    margin: 8px;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+  }
+  button {
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(4px);
+  }
+  button:hover { transform: scale(1.05); background: white; }
+  #yesBtn { background: #4CAF50; color: white; }
+  #noBtn { background: #f44336; color: white; position: relative; }
+
+  /* ---------- FANCY POPUP WITH MANY ANIMATIONS ---------- */
+
+  #popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: white;
+    padding: 30px 50px;
+    border-radius: 50px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #d43f6b;
+    box-shadow: 0 30px 50px rgba(0,0,0,0.4);
+    transition: 0.5s;
+    z-index: 1000;
+    border: 5px solid #ffb6c1;
+    text-align: center;
+    animation: none; /* will be added when shown */
+  }
+  #popup.show {
+    transform: translate(-50%, -50%) scale(1);
+    animation: popupBounce 0.8s ease, heartGlow 1.5s infinite alternate;
+  }
+  @keyframes popupBounce {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    70% { transform: translate(-50%, -50%) scale(0.95); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes heartGlow {
+    from { box-shadow: 0 0 20px #ff69b4, 0 0 40px #ffb6c1; }
+    to { box-shadow: 0 0 40px #ff1493, 0 0 80px #ff69b4; }
+  }
+  /* floating hearts around popup */
+  #popup.show::before, #popup.show::after {
+    content: "❤️ 😘 🥰 🌻 🌟";
+    position: absolute;
+    font-size: 3rem;
+    animation: floatHearts 3s infinite;
+    pointer-events: none;
+  }
+  #popup.show::before {
+    top: -50px;
+    left: -30px;
+    transform: rotate(-20deg);
+    animation-delay: 0.2s;
+  }
+  #popup.show::after {
+    bottom: -50px;
+    right: -30px;
+    transform: rotate(15deg);
+    animation-delay: 0.6s;
+  }
+  @keyframes floatHearts {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-40px) rotate(20deg); opacity: 0; }
+  }
+
+  /* home sticky tabs */
+  #home { display: block; padding: 0; }
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    background: rgba(255, 105, 180, 0.7);
+    backdrop-filter: blur(12px);
+    padding: 20px 10px;
+    border-bottom: 3px solid #ff69b4;
+  }
+  .tabs button {
+    font-size: 2rem;
+    padding: 16px 40px;
+    background: #ffe4ec;
+    border-radius: 60px;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border: 3px solid white;
+  }
+  .tabs button:hover { background: #ffb6c1; transform: scale(1.1); }
+
+  /* tab content panels - hidden by default, visible when active-section class added */
+
+  .tab {
+    display: none;
+    width: 100%;
+    max-width: 1200px;
+    margin: 30px auto 50px;
+    padding: 0 25px;
+    animation: fadeUp 0.6s ease;
+  }
+  .tab.active-section { display: block; }  /* used for sections when visible */
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* music huge */
+  #playlist {
+    list-style: none;
+    padding: 0;
+    font-size: 2rem;
+  }
+  #playlist li {
+    background: #ffe0f0;
+    margin: 20px 0;
+    padding: 25px 35px;
+    border-radius: 80px;
+    cursor: pointer;
+    font-weight: 600;
+    border: 3px solid white;
+    box-shadow: 0 5px 0 #ffb6c1;
+    transition: 0.2s;
+  }
+  #playlist li:hover { background: #ffb6c1; transform: translateY(-5px); }
+  audio { width: 100%; margin-top: 30px; border-radius: 60px; }
+
+  /* photos 3‑column grid */
+  #gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 20px;
+  }
+  .photo {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    border: 4px solid white;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s;
+  }
+  .photo:hover img { transform: scale(1.1); }
+  .heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 42px;
+    cursor: pointer;
+    text-shadow: 0 4px 8px black;
+    transition: 0.2s;
+  }
+  .heart.liked { color: red; transform: scale(1.4); }
+
+  /* message extra big */
+  .letter {
+    background: #fff0f5;
+    padding: 60px 50px;
+    border-radius: 70px;
+    max-width: 1000px;
+    margin: 30px auto;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    line-height: 1.1;
+    text-align: center;
+    border: 6px solid #ffb6c1;
+    box-shadow: 0 20px 30px #ff69b480;
+    font-weight: bold;
+  }
+
+
+  /* quiz box - visible by default on home */
+
+  .quizBox {
+    background: #ffe4ec;
+    backdrop-filter: blur(10px);
+    padding: 40px 40px 50px;
+    border-radius: 70px;
+    width: 95%;
+    max-width: 900px;
+    margin: 60px auto;
+    border: 5px solid white;
+    box-shadow: 0 30px 40px #d83c7b80;
+    transition: 0.3s;
+  }
+  .quizBox.hidden { display: none; }  /* hide quiz when section shown */
+
+  .quizBox h2 {
+    font-size: 3.5rem;
+    margin: 0 0 30px;
+    color: #b0306e;
+    text-shadow: 2px 2px white;
+  }
+  #quizForm p {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 40px 0 20px;
+    color: #88004c;
+  }
+  #quizForm label {
+    display: inline-block;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 60px;
+    margin: 8px 15px 8px 0;
+    font-size: 1.8rem;
+    border: 2px solid #ff99bb;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  #quizForm label:hover { background: #ffb6c1; transform: scale(1.02); }
+  #quizForm input[type="radio"] {
+    transform: scale(1.8);
+    margin-right: 15px;
+    accent-color: #ff1493;
+  }
+  #quizForm button[type="submit"] {
+    background: #ff1493;
+    color: white;
+    font-size: 2.8rem;
+    padding: 20px 60px;
+    border-radius: 100px;
+    margin-top: 50px;
+    border: 3px solid white;
+  }
+  #result {
+    font-size: 2.8rem;
+    margin-top: 40px;
+    background: rgba(255,255,255,0.7);
+    padding: 25px;
+    border-radius: 80px;
+  }
+
+  /* back button */
+  .back {
+    position: sticky;
+    bottom: 30px;
+    left: 30px;
+    background: white;
+    font-size: 1.8rem;
+    padding: 15px 35px;
+    border-radius: 60px;
+    border: 3px solid #ff69b4;
+    margin: 40px auto 30px 30px;
+    font-weight: 700;
+  }
+  .hearts::before {
+    content: "💖 💕 💘 💝 😚 🌟 🥰 🌻";
+    position: fixed;
+    font-size: 40px;
+    animation: rise 14s linear infinite;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes rise {
+    0% { transform: translateY(100vh); }
+    100% { transform: translateY(-100vh); }
+  }
+  @media (max-width: 800px) {
+    #gallery { grid-template-columns: repeat(2, 1fr); }
+    .tabs button { font-size: 1.4rem; padding: 12px 20px; }
+    .letter { font-size: 2.2rem; }
+  }
+  @media (max-width: 500px) {
+    #gallery { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="hearts"></div>
+
+<!-- LOGIN PAGE -->
+<div id="login" class="page active">
+  <div class="card">
+    <img src="folder0/Cat Love GIF by NGcorpvtc.gif" class="cat" alt="cute cats">
+    <h2>Enter Secret Code 💌</h2>
+    <input type="password" id="code" placeholder="secret code">
+    <button onclick="login()">Enter 💖</button>
+    <p id="error"></p>
+  </div>
+</div>
+
+<!-- QUESTION PAGE -->
+<div id="question" class="page">
+  <div class="card">
+    <img src="folder0/In love Cat GIF.gif" class="cat" alt="cute cat">
+    <h1>Will you be my Valentine?</h1>
+    <div>
+      <button id="yesBtn">Yes 🥰</button>
+      <button id="noBtn">No 🙄</button>
+    </div>
+  </div>
+  <button class="back" onclick="goTo('login')">⬅ Back</button>
+</div>
+
+<!-- HOME PAGE (scrollable) -->
+<div id="home" class="page">
+  <div class="tabs">
+    <button onclick="showSection('music')">🎵 Music</button>
+    <button onclick="showSection('photos')">📸 Photos</button>
+    <button onclick="showSection('message')">💌 Message</button>
+  </div>
+
+  <!-- MUSIC TAB (hidden initially) -->
+  <div id="music" class="tab">
+    <h2 style="font-size:4rem; text-align:center; color:#b0306e;">Play Any Music 🎶</h2>
+    <ul id="playlist"></ul>
+    <audio id="player" controls></audio>
+  </div>
+
+  <!-- PHOTOS TAB (hidden initially) -->
+  <div id="photos" class="tab">
+    <h2 style="font-size:4rem; text-align:center; color:#b0306e;">My Pretty 😚</h2>
+    <div id="gallery"></div>
+  </div>
+
+  <!-- MESSAGE TAB (hidden initially) -->
+  <div id="message" class="tab">
+    <div class="letter"><p id="typing"></p></div>
+  </div>
+
+  <!-- QUIZ – visible by default -->
+  <div class="quizBox" id="quizBox">
+    <h2>Quick Quiz For You 😚</h2>
+    <form id="quizForm"></form>
+    <div id="result"></div>
+  </div>
+
+  <button class="back" onclick="goTo('question')">⬅ Back</button>
+</div>
+
+<!-- FANCY POPUP (animated) -->
+<div id="popup">I knew it. I love you 💖😘</div>
+
+<script>
+  window.onload = () => goTo('login');
+  function goTo(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // if going to home, reset: hide sections, show quiz
+    if (id === 'home') {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-section'));
+      document.getElementById('quizBox').classList.remove('hidden');
+    }
+  }
+
+  const secret = "myprettycutie";
+  function login() {
+    if (document.getElementById("code").value === secret) {
+      goTo('question');
+    } else {
+      document.getElementById("error").innerText = "Incorret Code. Try Again, Cutie 😊";
+    }
+  }
+
+  // runaway NO button
+  let scale = 1;
+  const yes = document.getElementById("yesBtn");
+  const no = document.getElementById("noBtn");
+  no.onmouseover = () => {
+    no.style.position = "absolute";
+    no.style.left = Math.random() * 250 + "px";
+    no.style.top = Math.random() * 250 + "px";
+    scale += 0.2;
+    yes.style.transform = `scale(${scale})`;
+  };
+  yes.onclick = () => {
+    const popup = document.getElementById("popup");
+    popup.classList.add("show");
+    setTimeout(() => {
+      popup.classList.remove("show");
+      goTo('home');
+    }, 2000); // longer to enjoy animations
+  };
+
+  // show section (music/photos/message) and hide quiz
+  function showSection(sectionId) {
+    // hide all sections
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-section'));
+    // show selected section
+    document.getElementById(sectionId).classList.add('active-section');
+    // hide quiz box
+    document.getElementById('quizBox').classList.add('hidden');
+    // if message, start typing
+    if (sectionId === 'message') startTyping();
+  }
+
+  // MUSIC
+  const songs = [
+    ["Sustari Sustari", "folder0/song1.mpeg"],
+    ["Tum Se", "folder0/song2.mp3"],
+    ["Mere Banogi Kya", "folder0/song3.mp3"],
+    ["Perfect", "folder0/song4.mpeg"],
+    ["I Found A Girl I Like Being Around You", "folder0/song5.mp3"]
+  ];
+  const playlist = document.getElementById('playlist');
+  const player = document.getElementById('player');
+  let currentSongIndex = 0;
+
+songs.forEach((s, index) => {
+  let li = document.createElement("li");
+  li.innerText = s[0];
+  li.onclick = () => {
+    currentSongIndex = index;
+    playSong();
+  };
+  playlist.appendChild(li);
+});
+
+function playSong() {
+  player.src = songs[currentSongIndex][1];
+  player.play();
+}
+
+// Auto play next song when current ends
+player.addEventListener("ended", () => {
+  currentSongIndex++;
+  if (currentSongIndex >= songs.length) {
+    currentSongIndex = 0; // restart from first song
+  }
+  playSong();
+});
+
+
+  // PHOTOS grid
+  const myPhotos = [
+  "folder0/photo1.jpeg",
+  "folder0/photo2.jpeg",
+  "folder0/photo3.jpeg",
+  "folder0/photo4.jpeg",
+  "folder0/photo5.jpeg",
+  "folder0/photo6.jpeg",
+  "folder0/photo7.jpeg",
+  "folder0/photo8.jpeg",
+  "folder0/photo9.jpeg"
+];
+
+myPhotos.forEach(src => {
+  let div = document.createElement("div");
+  div.className = "photo";
+  div.innerHTML = `
+    <img src="${src}">
+    <div class="heart">🤍</div>
+  `;
+
+  div.querySelector(".heart").onclick = function () {
+    this.classList.toggle("liked");
+    this.innerText = this.classList.contains("liked") ? "❤️" : "🤍";
+  };
+
+  gallery.appendChild(div);
+});
+
+
+  // MESSAGE typing
+  let typed = false;
+  const text = "Hey cutie,, 💖";
+  function startTyping() {
+    if (typed) return;
+    typed = true;
+    let i = 0;
+    const typing = document.getElementById('typing');
+    typing.innerHTML = '';
+    let inter = setInterval(() => {
+      typing.innerHTML += text[i];
+      i++;
+      if (i >= text.length) clearInterval(inter);
+    }, 60);
+  }
+
+  // QUIZ
+  const qs = [
+    ["1. How Much You Love Me?", ["0%", "25%", "50%", "100%"], 3],
+    ["2. How Excited Are You To Meet Me?", ["Not Excited", "Excited Ultra Pro Max", "Little Excited", "Not Sure"], 1],
+    ["3. Who loves The Most In Our Relationship?", ["Me", "You", "We Both", "Noone"], 2],
+    ["4. Where Did We Recorded A Message For Our Future Self?", ["Sipsu", "Phuentsholing", "Thimphu", "Idk"], 1],
+    ["5. Whats Is The Final Destination Of Our Relationship?", ["Not Sure", "Friends With Benefits 😏", "Marriage", "Strangers"], 2]
+  ];
+  const quizForm = document.getElementById('quizForm');
+  qs.forEach((q, idx) => {
+    let html = `<p>${q[0]}</p>`;
+    q[1].forEach((opt, optIdx) => {
+      html += `<label><input type="radio" name="q${idx}" value="${optIdx}"> ${opt}</label> `;
+    });
+    quizForm.innerHTML += html + '<br>';
+  });
+  quizForm.innerHTML += `<br><button type="submit">Submit 💖</button>`;
+  quizForm.onsubmit = e => {
+    e.preventDefault();
+    let score = 0;
+    qs.forEach((q, idx) => {
+      let selected = document.querySelector(`input[name=q${idx}]:checked`);
+      if (selected && parseInt(selected.value) === q[2]) score++;
+    });
+    const result = document.getElementById('result');
+    result.innerHTML = `You scored ${score}/5 🌟<br>` +
+      (score === 5 ? "You did it. I love you 🫂💞" : "Still my favorite person 💘");
+  };
+</script>
+</body>
+</html>
